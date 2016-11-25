@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Extract Lat Lng</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="/Route_Planning/js/jquery.js"></script>
+    </head>
+    <body>
+        <script>
+            alert (getLat("agas"));
+            function getLat(place)
+            {
+                var res;
+                place="Roop Nagar,+Kamla Nagar,+Delhi,+110007";
+                var key = 'AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s';
+                $.ajax({
+                    type: 'GET',
+                    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+place+'&key='+key,
+                    dataType: 'json',
+                    global: false,
+                    async: false,
+                    success: function (result) {
+                        res = result;
+                    }
+                });
+                console.log(res);
+                lat=res['results'][0]['geometry']['location']['lat'];
+                lng=res['results'][0]['geometry']['location']['lng'];
+                return lat+" "+lng;
+            }
+        </script>
+    </body>
+</html>

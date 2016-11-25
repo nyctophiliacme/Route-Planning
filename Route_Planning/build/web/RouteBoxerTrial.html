@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <title>Perimeter Red</title>
+        <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places" type="text/javascript">
+        </script>
+        <script src="/Route_Planning/js/jquery.js"></script>
+        <script src="/Route_Planning/js/RouteBoxer.js" type="text/javascript"></script>
+        <script type="text/javascript">
+
+            var map = null;
+            var boxpolys = null;
+            var directions = null;
+            var routeBoxer = null;
+            var distance = .05;
+            var directionsService = null;
+            var service, infoWindow;
+            var count;
+            var markers = [];
+            var searchBoundCount;
+            var placeArr = [];
+            var placeName = [], placeAddress = [], placeNumber = [];
+
+            function initialize() {
+                var mapOptions = {
+                    center: new google.maps.LatLng(28.6161, 77.1779),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    zoom: 12
+                };
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                routeBoxer = new RouteBoxer();
+//                console.log(map);
+                directionsService = new google.maps.DirectionsService();
+                directionsRenderer = new google.maps.DirectionsRenderer({map: map});
+                infoWindow = new google.maps.InfoWindow();
+                service = new google.maps.places.PlacesService(map);
+                searchBoundCount = 0;
+
+            }
+
+            function route() {
+//                clearBoxes();
+                searchBoundCount = 0;
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+                count = 0;
+                placeArr = [];
+                placeName = [];
+                placeAddress = [];
+                placeNumber = [];
+//                distance = parseFloat(document.getElementById("distance").value);
+                var request = {
+                    origin: document.getElementById("from").value,
+                    destination: document.getElementById("to").value,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    provideRouteAlternatives: true
+                }
+
+                directionsService.route(request, function (result, status) {
+                    if (status == google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+
+                        console.log(result.routes.length);
+                        var path = result.routes[0].overview_path;
+                        var bounds = routeBoxer.box(path, distance);
+                        drawBoxes(bounds);
+
+                        searchBounds(bounds);
+//                        applySafetyFunction();
+
+                    } else {
+                        window.alert("Directions query failed: " + status);
+                    }
+                });
+            }
+
+            function searchBounds(bound) {
+                console.log("Bounds");
+                var i;
+
+                for (i = 0; i < bound.length; i++) {
+                    (function (i) {
+                        setTimeout(function () {
+//                            console.log("Now Displaying Bound no " + i + "which is" + bound[i]);
+//                            Perform search on the bound and save the result
+                            performSearch(bound[i]);
+                            if (i == bound.length - 1)
+                            {
+                                if (searchBoundCount++ > -1)
+                                {
+                                    //do nothing
+                                    displayPlaces();
+                                }
+                                else
+                                {
+                                    searchBounds(bound);
+                                }
+                            }
+                        }, 400 * i);
+                    }(i));
+                }
+            }
+
+            function performSearch(bound) {
+                var request = {
+                    bounds: bound,
+                    keyword: document.getElementById("via").value
+                };
+//                console.log(document.getElementById("via").value);
+                service.radarSearch(request, callback);
+            }
+
+            // Call back function from the radar search
+
+            function callback(results, status) {
+                if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                    //       windows.alert("Places Services failure");
+                    // console.error(status);
+                    return;
+                }
+                for (var i in results) {
+                    var place = results[i];
+//                    addMarker(results[i]);
+//                    console.log(count + "  " + lat + "  " + lng + "  " + curPlace);
+                    count++;
+                    displayMarker(place);
+                }
+            }
+
+            function displayPlaces()
+            {
+                console.log(placeArr.length);
+                for (var i in placeArr)
+                {
+                    console.log(placeArr[i]);
+                    place = placeArr[i];
+                    service.getDetails(place, function (result, status) {
+                        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                            console.error(status);
+                            return;
+                        }
+                        placeName.push(result.name);
+                        placeAddress.push(result.formatted_address);
+
+                        if (result.formatted_phone_number)
+                        {
+                            placeNumber.push(result.formatted_phone_number);
+                        }
+                        else
+                        {
+                            placeNumber.push("");
+                        }
+                    });
+                }
+            }
+            // Draw the array of boxes as polylines on the map
+            function drawBoxes(boxes) {
+                boxpolys = new Array(boxes.length);
+                for (var i = 0; i < boxes.length; i++) {
+                    boxpolys[i] = new google.maps.Rectangle({
+                        bounds: boxes[i],
+                        fillOpacity: 0,
+                        strokeOpacity: 1.0,
+                        strokeColor: '#000000',
+                        strokeWeight: 1,
+                        map: map
+                    });
+                }
+            }
+
+            // Clear boxes currently on the map
+            function clearBoxes() {
+                if (boxpolys != null) {
+                    for (var i = 0; i < boxpolys.length; i++) {
+                        boxpolys[i].setMap(null);
+                    }
+                }
+                boxpolys = null;
+            }
+
+
+            function displayMarker(place)
+            {
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: place.geometry.location
+                });
+                markers.push(marker);
+//                console.log(place);
+                placeArr.push(place);
+                var temp;
+                google.maps.event.addListener(marker, 'click', function () {
+                    service.getDetails(place, function (result, status) {
+                        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                            console.error(status);
+                            return;
+                        }
+                        var contentString = "<h4>" + result.name + "</h4><p>" + result.formatted_address + "</p>";
+//                        console.log(result);
+                        if (result.formatted_phone_number)
+                        {
+//                            console.log("Hurray");
+                            contentString += "<p>" + result.formatted_phone_number + "</p>";
+                        }
+                        infoWindow.setContent(contentString);
+//                        console.log(result);
+                        temp = result.name;
+                        infoWindow.open(map, marker);
+                    });
+                });
+//                console.log(temp);
+            }
+        </script>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 100%;
+            }
+            #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+                text-align: center;
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+            }
+        </style>
+    </head>
+    <body onload="initialize();">
+        <div id="floating-panel">
+            <b>Start: </b>
+            <input id="from" type="text" value="Connaught Place">
+                <b>End: </b>
+                <input id="to" type="text" value="Karol Bagh">
+                    <b>Via: </b><select id="via" >
+                        <option value="">SELECT</option>
+                        <option value="hospital">Hospital</option>
+                        <option value="police">Police</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="school">School</option>
+                    </select> 
+                    <b><input type="submit" onclick="route()"/></b>
+                    </div>
+                    <div id="map"></div>
+                    </body>
+                    </html>

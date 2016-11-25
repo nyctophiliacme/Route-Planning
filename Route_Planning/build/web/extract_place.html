@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="/Route_Planning/js/jquery.js"></script>
+    </head>
+    <body>
+        <script>
+            alert(getSublocality(28.6528, 77.1921));
+            function getSublocality(lat, lng)
+            {
+                var res;
+                var sublocality;
+                var level = "sublocality_level_1";
+                //var lat = 28.6528, lng = 77.1921;
+                var key = 'AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s';
+                $.ajax({
+                    //"url": 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+lat+','+lng+'&key=' + key,
+                    type: 'GET',
+                    url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + key,
+                    dataType: 'json',
+                    global: false,
+                    async: false,
+                    success: function (result) {
+                        res = result;
+                    }
+                });
+                console.log(res);
+                var typeArray = ["political", "sublocality", level];
+                var flag = 0;
+                for (var iterator in res['results'])
+                {
+                    for (var i in res['results'][iterator]['address_components'])
+                    {
+                        var is_same = (res['results'][iterator]['address_components'][i]['types'].length == typeArray.length) && res['results'][iterator]['address_components'][i]['types'].every(function (element, index) {
+                            return element === typeArray[index];
+                        });
+//                console.log(res['results'][0]['address_components'][i]['types']+"   "+is_same);
+                        if (is_same)
+                        {
+                            sublocality = res['results'][iterator]['address_components'][i]['long_name'];
+                            console.log(res['results'][iterator]['address_components'][i]['long_name']);
+                            flag = 1;
+                        }
+                    }
+                    if (flag == 1)
+                    {
+                        break;
+                    }
+                }
+                if(flag==0) return "Place Not Found";
+                else return sublocality;
+            }
+        </script>
+    </body>
+</html>

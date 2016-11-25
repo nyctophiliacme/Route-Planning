@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>Directions service</title>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 100%;
+            }
+            #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+                text-align: center;
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="floating-panel">
+            <b>Start: </b>
+            <input id="start" type="text" value="Mumbai">
+            <b>End: </b>
+            <input id="end" type="text" value="Mumbai">
+        </div>
+        <div id="map"></div>
+        <script>
+            var map;
+            var directionsDisplayArray = [];
+            function initMap() {
+                var directionsService = new google.maps.DirectionsService;
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 6,
+                    center: {lat: 20.5937, lng: 78.9629}
+                });
+                var onChangeHandler = function () {
+                    clearMap();
+                    calculateAndDisplayRoute(directionsService);
+                };
+                document.getElementById('start').addEventListener('change', onChangeHandler);
+                document.getElementById('end').addEventListener('change', onChangeHandler);
+            }
+            function clearMap() {
+//                console.log("directionsDisplayArray.length" + directionsDisplayArray.length);
+                for (var i = 0; i < directionsDisplayArray.length; i++)
+                {
+                    directionsDisplayArray[i].setMap(null);
+                }
+                directionsDisplayArray = [];
+//                map = new google.maps.Map(document.getElementById('map'));
+            }
+            function calculateAndDisplayRoute(directionsService) {
+                var request = {
+                    origin: document.getElementById('start').value,
+                    destination: document.getElementById('end').value,
+                    travelMode: 'DRIVING',
+                    provideRouteAlternatives: true
+                };
+                directionsService.route(request, function (response, status) {
+                    var temp = [];
+                    if (status === 'OK') {
+//                        console.log(response.routes);
+                        console.log(response.routes);
+                        for (var i = 0; i < response.routes.length; i++) {
+                            var directionsDisplay = new google.maps.DirectionsRenderer({
+                                directions: response,
+                                map: map,
+                                routeIndex: i,
+                                draggable: true
+                            });
+                            temp.push(directionsDisplay);
+                        }
+                        directionsDisplayArray.push.apply(directionsDisplayArray, temp);
+                        console.log(temp);
+//                        console.log(directionsDisplayArray);
+                    } else {
+                        alert('Directions request failed due to ' + status);
+                    }
+                });
+            }
+        </script>
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s&callback=initMap">
+        </script>
+    </body>
+</html>

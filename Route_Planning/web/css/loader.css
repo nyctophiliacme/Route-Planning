@@ -1,0 +1,102 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 25, 2016, 10:25:53 PM
+    Author     : PRANSH
+*/
+
+
+#loader{
+                height : 100%;
+                width: 100%;
+                position: absolute;
+                top:0px;
+                left:0px;
+                background-color: #34495e;/*#8e44ad;*/
+                z-index: 4;
+                opacity: 0.4;
+                display: none;
+            }
+            
+            #outerLoaderPart{
+                height:75px;
+                width : 75px;
+                background-color: black;
+                position: absolute;
+                top:300px;
+                left:45%;
+                z-index: 99;
+                animation: animateInnerLoader 4s infinite;
+                opacity: 0.9;
+                display: none;
+            }
+            
+            #innerLoaderPart{
+                height:75px;
+                width:75px;
+                background-color: green;
+                position:absolute;
+                top:300px;
+                left:45%;
+                z-index: 99;
+                transform: rotate(45deg);
+                animation: animateOuterLoader 4s infinite;
+                opacity: 0.9;
+                display: none;
+            }
+            
+            @keyframes animateOuterLoader{
+                0%{
+                    background-color:#2980b9;
+                }
+                20%{
+                    background-color:#8e44ad;
+                    transform : rotate(45deg);
+                }
+                40%{
+                   
+                    transform : rotate(90deg);
+                    background-color : #c0392b;
+                }
+                60%{
+                    transform : rotate(135deg);
+                    background-color: #16a085;
+                }
+                80%{
+                    transform : rotate(180deg);
+                    background-color: #f39c12;
+                }
+                100%{
+                    transform : rotate(0deg);
+                    background-color:#8e44ad;
+                }
+            }
+            
+            @keyframes animateInnerLoader{
+                0%{
+                   background-color: #8e44ad;
+                }
+                20%{
+                    background-color: #3498db;
+                    transform : rotate(-45deg);
+                }
+                40%{
+                    transform : rotate(-90deg);
+                    background-color : #8e44ad;
+                }
+                60%{
+                    transform : rotate(-135deg);
+                    background-color: #c0392b;
+                }
+                80%{
+                    transform : rotate(-180deg);
+                    background-color: #34495e;
+                }
+                100%{
+                    transform : rotate(0deg);
+                    background-color:#3498db;
+                }
+            }

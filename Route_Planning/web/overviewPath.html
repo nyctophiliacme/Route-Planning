@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Overview Path</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places,geometry" type="text/javascript">
+        </script>
+        <script src="/Route_Planning/js/jquery.js"></script>
+
+        <script>
+//            API keys:
+//              AIzaSyBbM-lAsNWBJQAglKwcwCE5rgZHtvlMxjs
+//              AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s
+//              AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo
+            var map, newMap, directionService, directionsRederer, infowindow;
+            var lat, lng;
+            var placesArray;
+            var curPlace;
+            var directionsDisplayArray = [];
+            var newDirectionsDisplayArray = [];
+            var polylines = [];
+            var safeValArray = [];
+            var stepPolylineArray = [];
+            var cotentStringArray = [];
+            var infowindow = new google.maps.InfoWindow();
+            function initialize() {
+                var mapOptions = {
+                    center: new google.maps.LatLng(28.6161, 77.1779),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    zoom: 12
+                };
+                placesArray = [];
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                newMap = new google.maps.Map(document.getElementById("newMap"), mapOptions);
+                directionsService = new google.maps.DirectionsService();
+
+                var inputFrom = (document.getElementById("from"));
+                var autocomplete1 = new google.maps.places.Autocomplete(inputFrom);
+                autocomplete1.bindTo('bounds', map);
+
+                var inputTo = (document.getElementById("to"));
+                var autocomplete2 = new google.maps.places.Autocomplete(inputTo);
+                autocomplete2.bindTo('bounds', map);
+                LoaderFunctions.hideLoader();
+            }
+            function route() {
+                //                clearBoxes();
+                //                distance = parseFloat(document.getElementById("distance").value);
+//                LoaderFunctions.showLoader();
+                for (var i = 0; i < directionsDisplayArray.length; i++)
+                {
+                    directionsDisplayArray[i].setMap(null);
+                }
+                safeValArray = [];
+                directionsDisplayArray = [];
+                var request = {
+                    origin: document.getElementById("from").value,
+                    destination: document.getElementById("to").value,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    provideRouteAlternatives: true
+                };
+                directionsService.route(request, function (response, status)
+                {
+                    var temp = [];
+                    var safeVal;
+                    if (status == google.maps.DirectionsStatus.OK)
+                    {
+                        console.log(response.routes);
+                        for (var i = 0; i < response.routes.length; i++)
+                        {
+                            console.log("Iteration Number" + i);
+                            placesArray = [];
+                            var directionsDisplay = new google.maps.DirectionsRenderer({
+                                directions: response,
+                                map: map,
+                                routeIndex: i,
+                                draggable: false,
+                            });
+                            var pointsArray = [];
+                            pointsArray = response.routes[i].overview_path;
+
+                            for (var j = 0; j < pointsArray.length; j++)
+                            {
+                                lat = pointsArray[j].lat();
+                                lng = pointsArray[j].lng();
+                                curPlace = getSublocality(lat, lng);
+                                if (curPlace == "Place Not Found")
+                                {
+//                                        console.log("*****" + curPlace);
+                                    continue;
+                                }
+                                if (placesArray.indexOf(curPlace) == -1)
+                                {
+                                    placesArray.push(curPlace);
+                                }
+                            }
+                            console.log(placesArray);
+                            safeVal = applySafetyFunction();
+                            safeValArray.push(safeVal);
+                            temp.push(directionsDisplay);
+                        }
+                        directionsDisplayArray.push.apply(directionsDisplayArray, temp);
+//                        console.log(temp);
+                        console.log(safeValArray);
+                        displayRoutes();
+                    }
+                })
+            }
+            function displayRoutes()
+            {
+                for (var i = 0; i < newDirectionsDisplayArray.length; i++)
+                {
+                    newDirectionsDisplayArray[i].setMap(null);
+                }
+                newDirectionsDisplayArray = [];
+                var request = {
+                    origin: document.getElementById("from").value,
+                    destination: document.getElementById("to").value,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    provideRouteAlternatives: true
+                };
+                directionsService.route(request, function (response, status)
+                {
+                    var temp = [];
+                    if (status == google.maps.DirectionsStatus.OK)
+                    {
+                        console.log(response.routes);
+                        for (var i = 0; i < response.routes.length; i++)
+                        {
+                            console.log("Iteration Number" + i);
+                            var directionsDisplay = new google.maps.DirectionsRenderer({
+                                directions: response,
+                                map: newMap,
+                                routeIndex: i,
+                                draggable: false,
+                                suppressPolylines: true
+                            });
+//                            directionsDisplay.setOptions({
+//                                polylineOptions: {
+//                                    strokeColor: "#ff00dd"
+//                                }
+//                            });
+                            temp.push(directionsDisplay);
+                        }
+
+                        renderDirectionsPolylines(response);
+                        newDirectionsDisplayArray.push.apply(newDirectionsDisplayArray, temp);
+//                        console.log(temp);
+
+                    }
+                })
+            }
+            function renderDirectionsPolylines(response)
+            {
+                for (var i = 0; i < polylines.length; i++) {
+                    polylines[i].setMap(null);
+                }
+                polylines = [];
+                contentStringArray = [];
+                console.log(safeValArray);
+                var polylineOptions;
+//                safeValArray[0]="3";safeValArray[1]="4";safeValArray[2]="5";
+                for (var itr = 0; itr < response.routes.length; itr++)
+                {
+//                    console.log("******" + safeValArray[itr]);
+                    switch (safeValArray[itr])
+                    {
+                        case "1":
+                            polylineOptions = {
+                                strokeColor: '#228B22',
+                                strokeOpacity: 0.9,
+                                strokeWeight: 6
+                            };
+                            break;
+                        case "2":
+                            polylineOptions = {
+                                strokeColor: '#2ecc71',
+                                strokeOpacity: 0.9,
+                                strokeWeight: 6
+                            };
+                            break;
+                        case "3":
+                            polylineOptions = {
+                                strokeColor: '#FFBB00',
+                                strokeOpacity: 0.9,
+                                strokeWeight: 6
+                            };
+                            break;
+                        case "4":
+                            polylineOptions = {
+                                strokeColor: '#FF7700',
+                                strokeOpacity: 0.92,
+                                strokeWeight: 6
+                            };
+                            break;
+                        case "5":
+                            polylineOptions = {
+                                strokeColor: '#FF1100',
+                                strokeOpacity: .8,
+                                strokeWeight: 6
+                            };
+                            break;
+                    }
+                    var contentString;
+                    var legs = response.routes[itr].legs;
+                    var stepPolyline = new google.maps.Polyline(polylineOptions);
+                    for (var i = 0; i < legs.length; i++) {
+                        var steps = legs[i].steps;
+                        for (var j = 0; j < steps.length; j++) {
+                            var nextSegment = steps[j].path;
+
+//                            console.log(stepPolyline);
+//                            console.log(stepPolyline);
+                            for (var k = 0; k < nextSegment.length; k++) {
+                                stepPolyline.getPath().push(nextSegment[k]);
+                            }
+                            // route click listeners, different one on each step
+//                            console.log("In renderer");
+//                            console.log(contentString);
+                        }
+                    }
+                    polylines.push(stepPolyline);
+                    var valSafe = 6 - Number(safeValArray[itr]);
+//                    console.log("*****" + valSafe);
+//                    contentString = "<h4>" + "The safety rating of this route is " + valSafe + "</h4>";
+                    contentString = "<h3>" + "The safety rating of this route is :</h3>"; 
+//                            console.log(contentString);
+                    for(var i=0;i< valSafe;i++)
+                    {
+//                        console.log("#####"+i);
+                        contentString+="<img src='/Route_Planning/imgs/yellow-star.jpg' alt='Star' style='width:35px;height:35px;'>&nbsp;&nbsp;";
+                    }
+                    contentStringArray.push(contentString);
+                    stepPolyline.setMap(newMap);
+                    displayInfoWindow();
+                }
+//                console.log("After renderer");
+//                console.log(polylines);
+                console.log(contentStringArray);
+                console.log(safeValArray);
+//                LoaderFunctions.hideLoader();
+            }
+            function displayInfoWindow()
+            {
+                var contentString;
+                for (var itr = 0; itr < polylines.length; itr++)
+                {
+                    google.maps.event.addListener(polylines[itr], 'click', function (evt)
+                    {
+//                        console.log(evt.latLng.lat() + " " + evt.latLng.lng());
+//                        console.log(this);
+//                        console.log("Before Iteration");
+                        for (var i = 0; i < polylines.length; i++)
+                        {
+//                            console.log("In iteration");
+                            if (google.maps.geometry.poly.isLocationOnEdge(evt.latLng, polylines[i], 10e-5) == true)
+                            {
+                                contentString = contentStringArray[i];
+                                break;
+                            }
+                        }
+//                        console.log("After iteration");
+
+//                    console.log(google.maps.geometry.poly.isLocationOnEdge(evt.latLng, this, 10e-1));                    
+//                                console.log("Hurray" + contentString);
+                        infowindow.setContent(contentString);
+                        infowindow.setPosition(evt.latLng);
+                        infowindow.open(newMap);
+                    })
+                }
+            }
+            function getSublocality(lat, lng)
+            {
+                var res;
+                var sublocality;
+                var level = "sublocality_level_1";
+                //var lat = 28.6528, lng = 77.1921;
+                var key = 'AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s';
+                $.ajax({
+                    //"url": 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+lat+','+lng+'&key=' + key,
+                    type: 'GET',
+                    url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + key,
+                    dataType: 'json',
+                    global: false,
+                    async: false,
+                    success: function (result) {
+                        res = result;
+                    }
+                });
+                //                console.log(res);
+                var typeArray = ["political", "sublocality", level];
+                var flag = 0;
+                for (var iterator in res['results'])
+                {
+                    for (var i in res['results'][iterator]['address_components'])
+                    {
+                        var is_same = (res['results'][iterator]['address_components'][i]['types'].length == typeArray.length) && res['results'][iterator]['address_components'][i]['types'].every(function (element, index) {
+                            return element === typeArray[index];
+                        });
+                        //                console.log(res['results'][0]['address_components'][i]['types']+"   "+is_same);
+                        if (is_same)
+                        {
+                            sublocality = res['results'][iterator]['address_components'][i]['long_name'];
+                            //                            console.log(res['results'][iterator]['address_components'][i]['long_name']);
+                            flag = 1;
+                        }
+                    }
+                    if (flag == 1)
+                    {
+                        break;
+                    }
+                }
+                if (flag == 0)
+                    return "Place Not Found";
+                else
+                    return sublocality;
+            }
+            function applySafetyFunction()
+            {
+                var safeVal;
+                var jsonPlaces = {
+                    "place_name": placesArray
+                }
+                var jsonPlaces = JSON.stringify(jsonPlaces);
+
+                console.log(jsonPlaces);
+                $.ajax({
+                    //"url": 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+lat+','+lng+'&key=' + key,
+                    url: 'http://localhost:8084/Route_Planning/applySafetyFunction.jsp',
+                    type: 'POST',
+                    data: "jsonPlaces=" + jsonPlaces,
+                    async: false,
+                    success: function (result) {
+//                        console.log("Success" + result);
+                        console.log("Success");
+                        res = result;
+                        safeVal = res.trim();
+                    },
+                    error: function (error)
+                    {
+                        console.log(error);
+                    }
+                });
+                console.log("SafeVal-->" + safeVal);
+                return safeVal;
+            }
+        </script>
+        <style>
+            @font-face { 
+                font-family: OpenSans; 
+                src: url('/Route_Planning/fonts/OpenSans-Regular.ttf');
+            }
+            @font-face { 
+                font-family: OpenSansBold; 
+                src: url('/Route_Planning/fonts/OpenSans-Bold.ttf');
+            }
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 100%;
+                display: none;
+            }
+            #newMap{
+                height: 100%;
+            }
+
+            #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #273238;
+                padding: 7px;
+                /*border: 1px solid #999;*/
+                text-align: center;
+                font-family: OpenSansBold;
+                /*line-height: 30px;*/
+                /*padding-left: 10px;*/
+                color:white;
+            }
+            input[type=submit] {
+                background-color:#3f9fc4; 
+                cursor:pointer;
+                color:white;
+                padding:2px;
+                padding-left: 20px;
+                padding-right: 20px; 
+                font-family: OpenSansBold;
+                text-transform: uppercase;
+                border:none;
+            }
+            input[type=text]
+            {
+                padding: 2px;
+            }
+
+            a {
+                position: absolute;
+                top: 10px;
+                left: 10%;
+                background-color: #273238;
+                padding: 9px;
+                font-family: OpenSansBold;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                color: white;
+
+            }
+            a:hover{
+                background-color: #3f9fc4;
+                color: white;
+            }
+        </style>
+        <link href = "/Route_Planning/css/loader.css" type = 'text/css' rel = "stylesheet"/>
+    </head>
+    <body onload="initialize();">
+        <div id ="loader"></div>
+        <div id = "outerLoaderPart"></div>
+        <div id = "innerLoaderPart"></div>
+        <div id="floating-panel">
+            <b>START: </b>
+            <input id="from" type="text" placeholder="Enter a location" value="Connaught Place, New Delhi, Delhi, India" size="35" >
+            <b>END: </b>
+            <input id="to" type="text" placeholder="Enter a location" value="Karol Bagh, New Delhi, Delhi, India" size="35">
+            <b><input type="submit" onclick="route()"/></b>
+        </div>
+
+        <div id="map"></div>
+        <div id="newMap"></div>
+
+        <a href="RouteBoxerNew.html">ROUTE PLANNING</a>
+        <script src= "/Route_Planning/loader.js"></script>
+        <script>
+            $(document).ready(function () {
+                LoaderFunctions.showLoader();
+            });
+        </script>
+    </body>
+</html>
+</body>
+</html>

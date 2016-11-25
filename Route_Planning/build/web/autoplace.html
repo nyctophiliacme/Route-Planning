@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places" type="text/javascript">
+        </script>
+        <script src="/Route_Planning/js/jquery.js"></script>
+        <script type = "text/javascript">
+
+            var map = null;
+            var directionsService;
+            var directionsDisplayArray = [];
+            function initialize() {
+                
+                var mapOptions = {
+                    center: new google.maps.LatLng(28.6161, 77.1779),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    zoom: 12
+                };
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                //                console.log(map);
+                directionsService = new google.maps.DirectionsService();
+                
+                var inputFrom = (document.getElementById("from"));
+                var autocomplete1 = new google.maps.places.Autocomplete(inputFrom);
+                autocomplete1.bindTo('bounds', map);
+                
+                var inputTo = (document.getElementById("to"));
+                var autocomplete2 = new google.maps.places.Autocomplete(inputTo);
+                autocomplete2.bindTo('bounds', map);
+                
+            }
+
+            function route() {
+                
+                //                clearBoxes();
+                clearMap();
+                //                distance = parseFloat(document.getElementById("distance").value);
+                var request = {
+                    origin: document.getElementById("from").value,
+                    destination: document.getElementById("to").value,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    provideRouteAlternatives: true
+                }
+
+                directionsService.route(request, function (result, status) {
+                    if (status == google.maps.DirectionsStatus.OK) {
+
+                        for (var i = 0; i < result.routes.length; i++)
+                        {
+                            //                            console.log("Iteration Number" + i);
+                            var directionsDisplay = new google.maps.DirectionsRenderer({
+                                directions: result,
+                                map: map,
+                                routeIndex: i,
+                                draggable: false
+                            });
+                            directionsDisplayArray.push(directionsDisplay);
+                        }
+
+                        console.log(result.routes.length);
+                    } else {
+                        window.alert("Directions query failed: " + status);
+                    }
+                });
+            }
+            function clearMap()
+            {
+                for (var i = 0; i < directionsDisplayArray.length; i++) {
+                    directionsDisplayArray[i].setMap(null);
+                }
+                directionsDisplayArray = [];
+            }
+        </script>
+
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 100%;
+            }
+            #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+                text-align: center;
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+            }
+        </style>
+    </head>
+    <body onload="initialize();">
+        <div id="floating-panel">
+            <b>Start: </b>
+            <input id="from" type="text" placeholder="Enter a location" value="Connaught Place, New Delhi, Delhi, India" size="35" >
+            <b>End: </b>
+            <input id="to" type="text" placeholder="Enter a location" value="Karol Bagh, New Delhi, Delhi, India" size="35">
+            <b><input type="submit" onclick="route()"/></b>
+        </div>
+        <div id="map"></div>
+    </body>
+</html>
+</body>
+</html>
