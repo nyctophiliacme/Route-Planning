@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-        <meta charset="utf-8">
-        <title>Directions service</title>
-        <style>
+<head>
+    <meta content="initial-scale=1.0, user-scalable=no" name="viewport">
+    <meta charset="utf-8">
+    <title>Directions service</title>
+    <style>
             html, body {
                 height: 100%;
                 margin: 0;
@@ -26,17 +26,18 @@
                 line-height: 30px;
                 padding-left: 10px;
             }
-        </style>
-    </head>
-    <body>
-        <div id="floating-panel">
-            <b>Start: </b>
-            <input id="start" type="text" value="Mumbai">
-            <b>End: </b>
-            <input id="end" type="text" value="Mumbai">
-        </div>
-        <div id="map"></div>
-        <script>
+
+    </style>
+</head>
+<body>
+<div id="floating-panel">
+    <b>Start: </b>
+    <input id="start" type="text" value="Mumbai">
+    <b>End: </b>
+    <input id="end" type="text" value="Mumbai">
+</div>
+<div id="map"></div>
+<script>
             var map;
             var directionsDisplayArray = [];
             function initMap() {
@@ -90,9 +91,10 @@
                     }
                 });
             }
-        </script>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s&callback=initMap">
-        </script>
-    </body>
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s&callback=initMap">
+</script>
+</body>
 </html>

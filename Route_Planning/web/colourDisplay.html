@@ -88,8 +88,9 @@ function renderDirectionsPolylines(response) {
 }
 google.maps.event.addDomListener(window, 'load', initialize);
 
-    </script>
-    <style>
+
+</script>
+<style>
         html,
 body {
   height: 100%;
@@ -187,26 +188,27 @@ h2 {
   margin: 0;
   padding: 0;
 }
-    </style>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s&libraries=places"></script>
+
+</style>
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s&libraries=places"></script>
 <title>Google Maps JavaScript API v3 Example: Transit</title>
 <div id="transit-wpr">
-  <button id="transit">Toggle transit layer</button>
+    <button id="transit">Toggle transit layer</button>
 </div>
 <div id="map"></div>
 <div id="panel-wpr">
-  <div id="info">
-    <div>
-      <label>from:</label>
-      <input class="input" id="from" value="Grand Central 42, NY">
+    <div id="info">
+        <div>
+            <label>from:</label>
+            <input class="input" id="from" value="Grand Central 42, NY">
+        </div>
+        <div>
+            <label>to:</label>
+            <strong>51 St, New York, NY 10022, USA</strong>
+        </div>
+        <div class="btn">
+            <button id="go">Get Directions</button>
+        </div>
     </div>
-    <div>
-      <label>to:</label>
-      <strong>51 St, New York, NY 10022, USA</strong>
-    </div>
-    <div class="btn">
-      <button id="go">Get Directions</button>
-    </div>
-  </div>
-  <div id="panel"></div>
+    <div id="panel"></div>
 </div>

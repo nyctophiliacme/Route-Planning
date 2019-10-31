@@ -5,7 +5,6 @@
  */
 
 /**
- *
  * @author PRANSH
  */
 package database_result;
@@ -15,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class master {
-    public static ResultSet get_val(Connection dbc,String x) {
+    public static ResultSet get_val(Connection dbc, String x) {
         ResultSet rs = null;
         String sql;
         PreparedStatement pst;

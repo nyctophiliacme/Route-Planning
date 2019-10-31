@@ -5,14 +5,15 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 <html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places" type="text/javascript">
-        </script>
-        <script src="/Route_Planning/js/jquery.js"></script>
-        <script type = "text/javascript">
+<head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places"
+            type="text/javascript">
+    </script>
+    <script src="/Route_Planning/js/jquery.js"></script>
+    <script type="text/javascript">
 
             var map = null;
             var directionsService;
@@ -78,9 +79,10 @@ and open the template in the editor.
                 }
                 directionsDisplayArray = [];
             }
-        </script>
 
-        <style>
+    </script>
+
+    <style>
             html, body {
                 height: 100%;
                 margin: 0;
@@ -102,18 +104,20 @@ and open the template in the editor.
                 line-height: 30px;
                 padding-left: 10px;
             }
-        </style>
-    </head>
-    <body onload="initialize();">
-        <div id="floating-panel">
-            <b>Start: </b>
-            <input id="from" type="text" placeholder="Enter a location" value="Connaught Place, New Delhi, Delhi, India" size="35" >
-            <b>End: </b>
-            <input id="to" type="text" placeholder="Enter a location" value="Karol Bagh, New Delhi, Delhi, India" size="35">
-            <b><input type="submit" onclick="route()"/></b>
-        </div>
-        <div id="map"></div>
-    </body>
+
+    </style>
+</head>
+<body onload="initialize();">
+<div id="floating-panel">
+    <b>Start: </b>
+    <input id="from" placeholder="Enter a location" size="35" type="text"
+           value="Connaught Place, New Delhi, Delhi, India">
+    <b>End: </b>
+    <input id="to" placeholder="Enter a location" size="35" type="text" value="Karol Bagh, New Delhi, Delhi, India">
+    <b><input onclick="route()" type="submit"/></b>
+</div>
+<div id="map"></div>
+</body>
 </html>
 </body>
 </html>
