@@ -5,15 +5,16 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 <html>
-    <head>
-        <title>Overview Path</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places,geometry" type="text/javascript">
-        </script>
-        <script src="/Route_Planning/js/jquery.js"></script>
+<head>
+    <title>Overview Path</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyACtVi6BiR5BPzbakAK0JtDicPQuCUoiPo&libraries=places,geometry"
+            type="text/javascript">
+    </script>
+    <script src="/Route_Planning/js/jquery.js"></script>
 
-        <script>
+    <script>
 //            API keys:
 //              AIzaSyBbM-lAsNWBJQAglKwcwCE5rgZHtvlMxjs
 //              AIzaSyBWaCbUsFEfHF8pSsBSZbTHNnIAZdm320s
@@ -350,8 +351,9 @@ and open the template in the editor.
                 console.log("SafeVal-->" + safeVal);
                 return safeVal;
             }
-        </script>
-        <style>
+
+    </script>
+    <style>
             @font-face { 
                 font-family: OpenSans; 
                 src: url('/Route_Planning/fonts/OpenSans-Regular.ttf');
@@ -420,32 +422,35 @@ and open the template in the editor.
                 background-color: #3f9fc4;
                 color: white;
             }
-        </style>
-        <link href = "/Route_Planning/css/loader.css" type = 'text/css' rel = "stylesheet"/>
-    </head>
-    <body onload="initialize();">
-        <div id ="loader"></div>
-        <div id = "outerLoaderPart"></div>
-        <div id = "innerLoaderPart"></div>
-        <div id="floating-panel">
-            <b>START: </b>
-            <input id="from" type="text" placeholder="Enter a location" value="Connaught Place, New Delhi, Delhi, India" size="35" >
-            <b>END: </b>
-            <input id="to" type="text" placeholder="Enter a location" value="Karol Bagh, New Delhi, Delhi, India" size="35">
-            <b><input type="submit" onclick="route()"/></b>
-        </div>
 
-        <div id="map"></div>
-        <div id="newMap"></div>
+    </style>
+    <link href="/Route_Planning/css/loader.css" rel="stylesheet" type='text/css'/>
+</head>
+<body onload="initialize();">
+<div id="loader"></div>
+<div id="outerLoaderPart"></div>
+<div id="innerLoaderPart"></div>
+<div id="floating-panel">
+    <b>START: </b>
+    <input id="from" placeholder="Enter a location" size="35" type="text"
+           value="Connaught Place, New Delhi, Delhi, India">
+    <b>END: </b>
+    <input id="to" placeholder="Enter a location" size="35" type="text" value="Karol Bagh, New Delhi, Delhi, India">
+    <b><input onclick="route()" type="submit"/></b>
+</div>
 
-        <a href="RouteBoxerNew.html">ROUTE PLANNING</a>
-        <script src= "/Route_Planning/loader.js"></script>
-        <script>
+<div id="map"></div>
+<div id="newMap"></div>
+
+<a href="RouteBoxerNew.html">ROUTE PLANNING</a>
+<script src="/Route_Planning/loader.js"></script>
+<script>
             $(document).ready(function () {
                 LoaderFunctions.showLoader();
             });
-        </script>
-    </body>
+
+</script>
+</body>
 </html>
 </body>
 </html>

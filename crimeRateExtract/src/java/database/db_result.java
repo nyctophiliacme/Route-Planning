@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- *
  * @author PRANSH
  */
 public class db_result {

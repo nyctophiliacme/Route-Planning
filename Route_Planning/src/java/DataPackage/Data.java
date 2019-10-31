@@ -5,20 +5,21 @@
  */
 
 /**
- *
  * @author PRANSH
  */
 package DataPackage;
+
 import java.util.List;
+
 public class Data {
     private List<String> place_name;
 
-        public List<String> getPlace_name() {
-            return place_name;
-        }
+    public List<String> getPlace_name() {
+        return place_name;
+    }
 
-        public void setPlace_name(List<String> place_name) {
-            this.place_name = place_name;
-        }
-        
+    public void setPlace_name(List<String> place_name) {
+        this.place_name = place_name;
+    }
+
 }
